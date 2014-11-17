@@ -29,11 +29,12 @@ module BeaconAttached
           ""
         end
       end
+
+      define_method :gen_hex do
+        Digest::MD5.hexdigest("#{self.class}:#{rand}:#{DateTime.now}")
+      end
     end
 
-    def gen_hex
-      Digest::MD5.hexdigest("#{self}:#{rand}:#{DateTime.now}")
-    end
   end
 
   if defined?(ActiveRecord)
