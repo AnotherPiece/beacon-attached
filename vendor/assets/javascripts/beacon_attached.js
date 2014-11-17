@@ -26,6 +26,7 @@ $.fn.remoteUploader = function(opt) {
 
   var attr_name = _this.data('attr');
   var field_name = _this.data('field');
+  var orig_hex = _this.data('key');
 
   var has_hidden_field = field_name !== undefined && attr_name !== undefined;
 
@@ -94,8 +95,12 @@ $.fn.remoteUploader = function(opt) {
     },
     'Key': function(up, file) {
       var nameParts = file.name.split('.')
-      var hex = MD5($.now()+Math.random()+file.name);
-      var key = hex[0] + "/" + hex[1] + "/" + hex[2] + "/" + hex + "/original." + nameParts[nameParts.length - 1];
+
+      var hex = orig_hex;
+      if (hex === undefined) {
+        hex = MD5($.now()+Math.random()+file.name);
+      }
+      key = hex[0] + "/" + hex[1] + "/" + hex[2] + "/" + hex + "/original." + nameParts[nameParts.length - 1];
 
       return key
     }
