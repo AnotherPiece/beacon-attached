@@ -19,7 +19,7 @@ var createUploader = function(btn, container, uptoken_url, bucket, callbacks) {
 };
 
 $.fn.remoteUploader = function(opt) {
-  // opt = $.extend();
+  opt = $.extend({container_id: 'upload-container'}, opt);
 
   var _this = $(this);
   var success_callback = opt.success;
@@ -45,7 +45,7 @@ $.fn.remoteUploader = function(opt) {
   if (has_hidden_field)
     _this.after(hidden_field);
 
-  createUploader(_this.attr('id'), 'upload-container', opt.uptoken_url, opt.bucket, {
+  createUploader(_this.attr('id'), opt.container_id, opt.uptoken_url, opt.bucket, {
     'FilesAdded': function(up, files) {
       plupload.each(files, function(file) {
         // 文件添加进队列后,处理相关的事情
