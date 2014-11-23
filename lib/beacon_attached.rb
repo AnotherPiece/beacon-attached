@@ -19,7 +19,7 @@ module BeaconAttached
     def has_beacon_attachment(name, options = {})
       define_method "#{name}_url".to_sym do |style = options[:default_style]|
         file_name = self.send("#{name}_file_name".to_sym)
-        Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]}/#{hex[0]}/#{hex[1]}/#{hex[2]}/#{hex}/original.#{file_name.split('.').last}?#{image_size(style)}")
+        Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]}/#{hex[0]}/#{hex[1]}/#{hex[2]}/#{hex}/#{qiniu_name(style)}.#{tail_fix(style, file_name)}?#{image_size(style)}")
       end
 
       define_method :image_size do |style|
@@ -30,8 +30,24 @@ module BeaconAttached
         end
       end
 
+      define_method :tail_fix do |style, file_name|
+        if style && options[:qiniu_bit_style] && options[:qiniu_bit_style][style].present?
+          'mp3'
+        else
+          file_name.split('.').last
+        end
+      end
+
+      define_method :qiniu_name do |style|
+        if style && options[:qiniu_bit_style] && options[:qiniu_bit_style][style].present?
+          style.to_s
+        else
+          "original"
+        end
+      end
+
       define_method :gen_hex do
-        Digest::MD5.hexdigest("#{self.class}:#{rand}:#{DateTime.now}")
+        Digest::MD5.hexdigest("#{self.class}:#{DateTime.now}:#{rand}")
       end
     end
 

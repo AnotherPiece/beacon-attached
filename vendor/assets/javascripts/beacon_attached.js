@@ -1,14 +1,15 @@
 //= require jquery.md5
 
-var createUploader = function(btn, container, uptoken_url, bucket, callbacks) {
+var createUploader = function(btn, front_key, container, uptoken_url, bucket, callbacks) {
   return Qiniu.uploader({
-      runtimes: 'html5',    //上传模式,依次退化
+      runtimes: 'html5,html4',    //上传模式,依次退化
       browse_button: btn,       //上传选择的点选按钮，**必需**
       uptoken_url: uptoken_url,            //Ajax请求upToken的Url，**强烈建议设置**（服务端提供）
-      // save_key: true,
+      save_key: front_key,
+      // flash_swf_url: 'javascripts/Moxie.swf',
       domain: 'http://' + bucket + '.qiniudn.com/',   //bucket 域名，下载资源时用到，**必需**
       container: container,           //上传区域DOM ID，默认是browser_button的父元素，
-      max_file_size: '100mb',           //最大文件体积限制
+      max_file_size: '1000mb',           //最大文件体积限制
       max_retries: 3,                   //上传失败最大重试次数
       dragdrop: true,                   //开启可拖曳上传
       drop_element: container,        //拖曳上传区域元素的ID，拖曳文件或文件夹后可触发上传
@@ -19,7 +20,7 @@ var createUploader = function(btn, container, uptoken_url, bucket, callbacks) {
 };
 
 $.fn.remoteUploader = function(opt) {
-  opt = $.extend({container_id: 'upload-container'}, opt);
+  opt = $.extend({container_id: 'upload-container', front_key: false}, opt);
 
   var _this = $(this);
   var success_callback = opt.success;
@@ -46,7 +47,7 @@ $.fn.remoteUploader = function(opt) {
   if (has_hidden_field)
     _this.after(hidden_field);
 
-  createUploader(_this.attr('id'), opt.container_id, opt.uptoken_url, opt.bucket, {
+  createUploader(_this.attr('id'), opt.front_key, opt.container_id, opt.uptoken_url, opt.bucket, {
     'FilesAdded': function(up, files) {
       plupload.each(files, function(file) {
         // 文件添加进队列后,处理相关的事情
@@ -59,7 +60,8 @@ $.fn.remoteUploader = function(opt) {
     },
     'FileUploaded': function(up, file, info) {
       var res = $.parseJSON(info);
-      // var sourceLink = domain + res.key; 获取上传成功后的文件的Url
+      var domain = up.getOption('domain');
+      var sourceLink = domain + res.key;
 
       var fileSize = file.size;
       var contentType = file.type;
@@ -83,6 +85,7 @@ $.fn.remoteUploader = function(opt) {
       data.fileSize = fileSize;
       data.contentType = contentType;
       data.key = res.key;
+      data.url = sourceLink;
 
       if (success_callback !== undefined)
         success_callback(data);
@@ -98,11 +101,11 @@ $.fn.remoteUploader = function(opt) {
 
       var hex = orig_hex;
       if (hex === undefined) {
-        hex = MD5($.now()+Math.random()+file.name);
+        hex = MD5(file.name + ":" + $.now() + ":" + Math.random());
       }
       key = hex[0] + "/" + hex[1] + "/" + hex[2] + "/" + hex + "/original." + nameParts[nameParts.length - 1];
 
-      return key
+      return key;
     }
   });
 
