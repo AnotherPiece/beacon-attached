@@ -6,7 +6,7 @@ require "beacon_attached/version"
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = "beacon_attached"
-  s.version     = BeaconAttached::VERSION
+  s.version     = '1.0.0'
   s.authors     = ["Yeah"]
   s.email       = ["yeah@yu.fm"]
   s.homepage    = ""
