@@ -18,7 +18,7 @@ module BeaconAttached
   module ClassMethods
     def has_beacon_attachment(name, options = {})
       define_method "#{name}_url".to_sym do |style = options[:default_style]|
-        "" if hex.blank?
+        return "" if hex.blank?
 
         file_name = self.send("#{name}_file_name".to_sym)
         Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]}/#{hex[0]}/#{hex[1]}/#{hex[2]}/#{hex}/#{qiniu_name(style)}.#{tail_fix(style, file_name)}?#{image_size(style)}")
