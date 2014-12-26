@@ -21,7 +21,11 @@ module BeaconAttached
         return "" if hex.blank?
 
         file_name = self.send("#{name}_file_name".to_sym)
-        Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]}/#{hex[0]}/#{hex[1]}/#{hex[2]}/#{hex}/#{qiniu_name(style)}.#{tail_fix(style, file_name)}?#{image_size(style)}")
+        res = Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]}/#{hex[0]}/#{hex[1]}/#{hex[2]}/#{hex}/#{qiniu_name(style)}.#{tail_fix(style, file_name)}?#{image_size(style)}")
+
+        if res.blank?
+          res = Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]/options[:missing_file]}")
+        end
       end
 
       define_method :image_size do |style|
