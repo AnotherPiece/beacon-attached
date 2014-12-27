@@ -22,7 +22,7 @@ module BeaconAttached
           res = ""
         else
           file_name = self.send("#{name}_file_name".to_sym)
-          res = Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]}/#{hex[0]}/#{hex[1]}/#{hex[2]}/#{hex}/#{qiniu_name(style)}.#{tail_fix(style, file_name)}?#{image_size(style)}")
+          res = file_name && Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]}/#{hex[0]}/#{hex[1]}/#{hex[2]}/#{hex}/#{qiniu_name(style)}.#{tail_fix(style, file_name)}?#{image_size(style)}")
         end
 
         if res.blank? && options[:missing_file].present?
@@ -30,6 +30,11 @@ module BeaconAttached
         end
 
         res
+      end
+
+      define_method "#{name}_avinfo_url".to_sym do
+        file_name = self.send("#{name}_file_name".to_sym)
+        Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]}/#{hex[0]}/#{hex[1]}/#{hex[2]}/#{hex}/#{qiniu_name(:original)}.#{tail_fix(:original, file_name)}?avinfo")
       end
 
       define_method :image_size do |style|
