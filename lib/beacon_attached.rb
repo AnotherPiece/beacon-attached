@@ -49,7 +49,7 @@ module BeaconAttached
         if style && options[:qiniu_bit_style] && options[:qiniu_bit_style][style].present?
           'mp3'
         else
-          file_name.split('.').last
+          'jpg'
         end
       end
 
