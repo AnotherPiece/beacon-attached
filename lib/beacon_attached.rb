@@ -18,10 +18,23 @@ module BeaconAttached
   module ClassMethods
     def has_beacon_attachment(name, options = {})
       define_method "#{name}_url".to_sym do |style = options[:default_style]|
-        return "" if hex.blank?
+        if hex.blank?
+          res = ""
+        else
+          file_name = self.send("#{name}_file_name".to_sym)
+          res = file_name && Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]}/#{hex[0]}/#{hex[1]}/#{hex[2]}/#{hex}/#{qiniu_name(style)}.#{tail_fix(style, file_name)}?#{image_size(style)}")
+        end
 
+        if res.blank? && options[:missing_file].present?
+          res = Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]}/#{options[:missing_file]}")
+        end
+
+        res
+      end
+
+      define_method "#{name}_avinfo_url".to_sym do
         file_name = self.send("#{name}_file_name".to_sym)
-        Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]}/#{hex[0]}/#{hex[1]}/#{hex[2]}/#{hex}/#{qiniu_name(style)}.#{tail_fix(style, file_name)}?#{image_size(style)}")
+        Qiniu::Auth.authorize_download_url("#{options[:qiniu_host]}/#{hex[0]}/#{hex[1]}/#{hex[2]}/#{hex}/#{qiniu_name(:original)}.#{tail_fix(:original, file_name)}?avinfo")
       end
 
       define_method :image_size do |style|
@@ -36,7 +49,7 @@ module BeaconAttached
         if style && options[:qiniu_bit_style] && options[:qiniu_bit_style][style].present?
           'mp3'
         else
-          file_name.split('.').last
+          'jpg'
         end
       end
 
