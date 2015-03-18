@@ -103,7 +103,14 @@ $.fn.remoteUploader = function(opt) {
       if (hex === undefined) {
         hex = MD5(file.name + ":" + $.now() + ":" + Math.random());
       }
-      key = hex[0] + "/" + hex[1] + "/" + hex[2] + "/" + hex + "/original." + nameParts[nameParts.length - 1];
+
+      var tailFix;
+      if ($.inArray(file.type, ['image/jpg','image/jpeg', 'image/pjpeg']) >= 0)
+        tailFix = "jpg"
+      else
+        tailFix = nameParts[nameParts.length - 1];
+
+      key = hex[0] + "/" + hex[1] + "/" + hex[2] + "/" + hex + "/original." + tailFix;
 
       return key;
     }
