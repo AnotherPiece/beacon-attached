@@ -46,6 +46,8 @@ module BeaconAttached
       end
 
       define_method :tail_fix do |style, file_name|
+        return options[:tail_fix] if options[:tail_fix].present?
+
         if style && options[:qiniu_bit_style] && options[:qiniu_bit_style][style].present?
           'mp3'
         else
